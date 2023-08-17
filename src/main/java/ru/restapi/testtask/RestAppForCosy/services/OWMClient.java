@@ -4,19 +4,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ru.restapi.testtask.RestAppForCosy.utils.City;
 import ru.restapi.testtask.RestAppForCosy.utils.OWMResponse;
 import ru.restapi.testtask.RestAppForCosy.models.Weather;
 import ru.restapi.testtask.RestAppForCosy.repositories.WeatherRepository;
 
 import java.time.LocalDateTime;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OWMClient {
 
     private final RestTemplate restTemplate;
     private final WeatherRepository weatherRepository;
-
 
     @Autowired
     public OWMClient(RestTemplate restTemplate, WeatherRepository weatherRepository) {
@@ -26,26 +28,22 @@ public class OWMClient {
 
     @Scheduled(fixedRate = 60000) // выполнение запроса каждую минуту
     public void fetchWeatherDataAndSave() {
-        String baseUrl ="https://api.openweathermap.org/data/2.5/weather";
+        String baseUrl = "https://api.openweathermap.org/data/2.5/weather";
         String apiKey = "16a77f7fd156c6e1111c2b37f87715d6";
 
-        OWMResponse response = restTemplate.getForObject(
-                baseUrl + "?q=" + getRandomCity() + "&units=metric&appid=" + apiKey, OWMResponse.class);
-        Weather weather = new Weather();
-        weather.setName(response.getName());
-        weather.setTemp(response.getMain().getTemp());
-        weather.setAddedAt(LocalDateTime.now());
+        String[] cities = {City.TOLYATTI, City.PARIS, City.ROME};
+        List<Weather> weatherList = new ArrayList<>();
 
-        weatherRepository.save(weather);
+        for (String city : cities) {
+            OWMResponse response = restTemplate.getForObject(
+                    baseUrl + "?q=" + city + "&units=metric&appid=" + apiKey, OWMResponse.class);
+            Weather weather = new Weather();
+            weather.setName(Objects.requireNonNull(response).getName());
+            weather.setTemp(response.getMain().getTemp());
+            weather.setAddedAt(LocalDateTime.now());
+
+            weatherList.add(weather);
+        }
+        weatherRepository.saveAll(weatherList);
     }
-
-    private String getRandomCity() {
-        String[] cities = {"Tolyatti", "Paris", "Rome"};
-        Random random = new Random();
-        int index = random.nextInt(cities.length);
-        return cities[index];
-    }
-
-
-
 }
