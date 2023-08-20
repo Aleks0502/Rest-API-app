@@ -25,8 +25,8 @@ public class WeatherController {
     }
 
     @GetMapping("{city}")
-    public WeatherDTO getAverageCityTemp(@PathVariable("city") String city) {
-        return convertToWeatherDTO(weatherService.getAverageCityTemp(city));
+    public WeatherDTO getAverageWeatherByCity(@PathVariable("city") String city) {
+        return convertToWeatherDTO(weatherService.getAverageWeatherByCity(city));
     }
 
     @GetMapping("/cities/average-temp")

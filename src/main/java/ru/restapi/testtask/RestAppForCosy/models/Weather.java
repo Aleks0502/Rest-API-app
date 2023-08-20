@@ -17,6 +17,11 @@ public class Weather {
 
     public Weather() {}
 
+    public Weather(String name, double temp) {
+        this.name = name;
+        this.temp = temp;
+    }
+
     public Weather(String name, double temp, LocalDateTime addedAt) {
         this.name = name;
         this.temp = temp;

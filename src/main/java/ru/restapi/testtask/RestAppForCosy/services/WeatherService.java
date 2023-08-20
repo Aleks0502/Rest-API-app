@@ -20,7 +20,7 @@ public class WeatherService {
         this.weatherRepository = weatherRepository;
     }
 
-    public Weather getAverageCityTemp(String city) {
+    public Weather getAverageWeatherByCity(String city) {
         Weather weather = new Weather();
         weather.setName(city);
         weather.setTemp(getAverageTemp(weatherRepository.findAllByName(city)));
